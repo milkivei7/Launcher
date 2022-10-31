@@ -1,17 +1,13 @@
 ﻿#include <cstdio>
-#include <cstring>
-#include <iostream>
-
-
 
 int const Count = 2;
 
 struct InfoGame
 {     
     const CHAR *srcGame;
-    char NameGame;
+    std::string NameGame;
 
-    InfoGame(char Name, const CHAR *ipGame)
+    InfoGame(std::string Name, const CHAR *ipGame)
     {
         NameGame = Name;
         srcGame = ipGame;

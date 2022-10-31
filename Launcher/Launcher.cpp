@@ -8,14 +8,14 @@ using namespace std;
 int main()
 {
     setlocale(LC_ALL, "RU");
-    char NameApplication;
-    InfoGame Mafia('Mafia', "steam://rungameid/40990");
+    string NameApplication;
+    InfoGame Mafia("Mafia", "steam://rungameid/40990");
 
     //cout<< "Введите название игры: ";
     //cin>> NameApplication;
     //StartGame(Mafia);
 
-    cout<< Mafia.srcGame<<" "<< Mafia.NameGame;
+    cout<< sizeof(InfoGame);
     
     return 0;
 }
