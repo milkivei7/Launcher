@@ -26,8 +26,6 @@ int main()
     
     //StartGame(Mafia);
 
-    
-    
     return 0;
 }
 
