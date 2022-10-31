@@ -1,5 +1,5 @@
 #include <iostream>
-#include <Windows.h>
+#include <windows.h>
 #include "Launcher.h"
 
 using namespace std;
@@ -7,15 +7,26 @@ using namespace std;
 
 int main()
 {
-    setlocale(LC_ALL, "RU");
-    string NameApplication;
-    InfoGame Mafia("Mafia", "steam://rungameid/40990");
 
-    //cout<< "Введите название игры: ";
-    //cin>> NameApplication;
+    setlocale(0, "");
+    std::string NameApplication;
+    //InfoGame Mafia("Mafia", "steam://rungameid/40990");
+
+    cout<< "Write name of game please: ";
+    cin>> NameApplication;
+    for (i ; i<2;i++)
+    {
+        if (Name.values[i]->NameGame == NameApplication){StartGame(*Name.values[i]); cout<<"Game playing....";}
+        
+        
+    }
+
+
+    
+    
     //StartGame(Mafia);
 
-    cout<< sizeof(InfoGame);
+    
     
     return 0;
 }
