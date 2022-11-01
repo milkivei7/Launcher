@@ -13,4 +13,5 @@ int main()
     {
         if (Name.values[i]->NameGame == NameApplication){StartGame(*Name.values[i]); cout<<"Game playing....";}
     }
+    
 }

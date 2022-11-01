@@ -14,6 +14,7 @@ struct InfoGame
     }
 };
 
+
 struct
 {
     InfoGame Mafia = InfoGame("Mafia", "steam://rungameid/40990");
