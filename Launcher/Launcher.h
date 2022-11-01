@@ -1,4 +1,4 @@
-﻿#include <cstdio>
+﻿#include <windows.h>
 
 int const Count = 2;
 int i = 0;
@@ -22,23 +22,7 @@ struct
     const InfoGamePtr values [2] = {&Mafia, &Steam};
 }Name;
 
+auto StartGame(InfoGame Games){return ShellExecuteA(nullptr, "open",
+    Games.srcGame, nullptr, nullptr, SW_HIDE);}
 
-auto StartGame(InfoGame Games)
-{
-    return ShellExecuteA(nullptr, "open", Games.srcGame, nullptr, nullptr, SW_HIDE);
-}
 
-void CheckGame(std::string *NameApplication);
-
-/*class NameGames
-{
-    CHAR *srcGames;
-    public:
-        static auto StartGame(const CHAR *srcGames);
-};
-
-auto NameGames::StartGame(const CHAR *srcGames) {
-
-    return ShellExecuteA(NULL, "open", srcGames, 0, 0, SW_HIDE);
-}
-*/
