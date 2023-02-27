@@ -17,6 +17,8 @@ set(PROJECT_SOURCES
         launcher.cpp
         launcher.h
         launcher.ui
+        style.css
+
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
