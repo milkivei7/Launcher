@@ -135,8 +135,12 @@ void Launcher::deleteGame()
             bufferInfoGames.open(QIODevice::ReadWrite | QIODevice::Text)&&
             bufferSrcGames.open(QIODevice::ReadWrite | QIODevice::Text))
     {
+
         qDebug()<<"Файлы открылись успешно"<<Qt::endl;
         int index = listWidget->currentRow();
+
+        QString ReadAllInfo = infoNameGames.readAll();
+        QString ReadAllSrc = srcNameGames.readAll();
 
         //create TextStream with info and src
         QTextStream streamBufferInfo(&bufferInfoGames);
@@ -154,6 +158,9 @@ void Launcher::deleteGame()
         srcNameGames.seek(0);
 
         while(!(infoNameGames.atEnd()&&srcNameGames.atEnd())){
+
+
+
             //Присвоение строки к переменной ReadLineInfo
             QString ReadLineInfo = infoNameGames.readLine();
             ReadLineInfo.resize(ReadLineInfo.size()-1);
@@ -162,15 +169,17 @@ void Launcher::deleteGame()
             QString ReadLineSrc = srcNameGames.readLine();
             ReadLineSrc.resize(ReadLineSrc.size()-1);
 
+
             //ReadLineSrc.removeLast();
             if (NameToDelete == ReadLineInfo)
             {
 
                 qDebug()<<"Удаляем строчку"<<ReadLineInfo<<"  "<<ReadLineSrc<<Qt::endl;
                 ReadLineInfo.resize(ReadLineInfo.size());
-                infoNameGames.remove(ReadLineInfo);
+                ReadAllInfo.remove(ReadLineInfo);
+
                 ReadLineSrc.resize(ReadLineSrc.size());
-                srcNameGames.remove(ReadLineSrc);
+                ReadAllSrc.remove(ReadLineSrc);
 
             }
             else
@@ -179,7 +188,13 @@ void Launcher::deleteGame()
                 streamBufferInfo<<ReadLineInfo<<Qt::endl;
                 streamBufferSrc<<ReadLineSrc<<Qt::endl;
             }
+
         }
+        infoNameGames.seek(0);
+        infoNameGames.write(ReadAllInfo.toUtf8());
+        srcNameGames.seek(0);
+        srcNameGames.write(ReadAllSrc.toUtf8());
+
         //Удаляем элемент item из QListWidget'ов
         delete item;
         delete itemSrcGames;
@@ -208,6 +223,7 @@ void Launcher::deleteGame()
     if(infoNameGames.open(QIODevice::Append|QIODevice::Text)&&srcNameGames.open(QIODevice::Append)|QIODevice::Text
             && bufferInfoGames.open(QIODevice::ReadWrite|QIODevice::Text)&&bufferSrcGames.open(QIODevice::ReadWrite|QIODevice::Text))
     {
+
         qDebug()<<"Файл с буффером успешно открыт"<<Qt::endl;
         QTextStream outInfoNameGames(&infoNameGames);
         QTextStream outSrcGames(&srcNameGames);
