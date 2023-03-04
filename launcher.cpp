@@ -18,6 +18,7 @@ Launcher::Launcher(QWidget *parent)
     bDeleteGame->setText("Delete");
 
     listWidget = ui->lastWidget;
+
     HideListWidget = ui->hideWidget;
     HideListWidget->hide();
 
@@ -34,14 +35,9 @@ Launcher::Launcher(QWidget *parent)
     vAllLayout->addLayout(vLayout);
     vAllLayout->addLayout(hLayout);
 
-    //bStartGame->stackUnder(listWidget);
-
-    //bAnimation(*bStartGame);
-
     connect(addApp, SIGNAL(clicked()), this, SLOT(addGame()));
     connect(bStartGame, SIGNAL(clicked()), this, SLOT(launchGame()));
     connect(bDeleteGame, SIGNAL(clicked()), this, SLOT(deleteGame()));
-
 
     loadFromFile();
 }
@@ -82,6 +78,21 @@ void Launcher::addGame()
     QFile srcNameGames("C:\\Users\\dark_\\Desktop\\QT Projects\\srcNameGames.txt");
 
 
+    db = QSqlDatabase::addDatabase("QODBC");
+    db.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};FIL={MS Access};DBQ=C:/Users/dark_/Desktop/QT Projects/Launcher/SQL Tables/InfoGamesDB.accdb");
+
+    if (db.open())
+    {
+        qDebug()<<"Data base is open"<<Qt::endl;
+        QSqlQuery query;
+        query.prepare("INSERT INTO InfoGames (InfoGame, SrcGame) "
+                           "VALUES (:InfoGame, :SrcGame)");
+        query.bindValue(":InfoGame", fileName.right(fileName.size()-fileName.lastIndexOf("/")-1));
+        query.bindValue(":SrcGame", fileName);
+        query.exec();
+        db.close();
+    }
+    else qDebug()<<"Data base isn't open: "<<db.lastError();
 
     if (infoNameGames.open(QIODevice::Append | QIODevice::Text) && srcNameGames.open(QIODevice::Append | QIODevice::Text)){
         qDebug()<<"Запись в файл началась\n";
@@ -122,30 +133,15 @@ void Launcher::bAnimation(QPushButton &Button)
 
 void Launcher::deleteGame()
 {
-    //open files with name and src
-    QFile infoNameGames("C:\\Users\\dark_\\Desktop\\QT Projects\\infoNameGames.txt");
-    QFile srcNameGames("C:\\Users\\dark_\\Desktop\\QT Projects\\srcNameGames.txt");
-    // Create buffer fiels
-    QFile bufferInfoGames("bufferInfoGames.txt");
-    QFile bufferSrcGames("buffersrcGames.txt");
+    db = QSqlDatabase::addDatabase("QODBC");
+    db.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};FIL={MS Access};DBQ=C:/Users/dark_/Desktop/QT Projects/Launcher/SQL Tables/InfoGamesDB.accdb");
 
-    //Open files
-    if (infoNameGames.open(QIODevice::ReadWrite | QIODevice::Text  ) &&
-            srcNameGames.open(QIODevice::ReadWrite | QIODevice::Text )&&
-            bufferInfoGames.open(QIODevice::ReadWrite | QIODevice::Text)&&
-            bufferSrcGames.open(QIODevice::ReadWrite | QIODevice::Text))
+    if (db.open())
     {
-
-        qDebug()<<"Файлы открылись успешно"<<Qt::endl;
+        qDebug()<<"Data for delete is open"<<Qt::endl;
+        QSqlQuery query;
         int index = listWidget->currentRow();
-
-        QString ReadAllInfo = infoNameGames.readAll();
-        QString ReadAllSrc = srcNameGames.readAll();
-
-        //create TextStream with info and src
-        QTextStream streamBufferInfo(&bufferInfoGames);
-        QTextStream streamBufferSrc(&bufferSrcGames);
-
+        qDebug()<<"number index = "<<index<<Qt::endl;
         //передаем по индексу элемент
         QListWidgetItem* item = listWidget->item(index);
         QListWidgetItem* itemSrcGames = HideListWidget->item(index);
@@ -153,138 +149,53 @@ void Launcher::deleteGame()
         QString NameToDelete = item->text();
         qDebug()<<NameToDelete<<Qt::endl;
 
-        //Переходим в начало файлов
-        infoNameGames.seek(0);
-        srcNameGames.seek(0);
+        query.prepare("DELETE FROM InfoGames WHERE InfoGame=:InfoGame");
+        query.bindValue(":InfoGame", NameToDelete);
+        query.exec();
 
-        while(!(infoNameGames.atEnd()&&srcNameGames.atEnd())){
-
-
-
-            //Присвоение строки к переменной ReadLineInfo
-            QString ReadLineInfo = infoNameGames.readLine();
-            ReadLineInfo.resize(ReadLineInfo.size()-1);
-
-            //Присвоение строки к переменной ReadLineSrc
-            QString ReadLineSrc = srcNameGames.readLine();
-            ReadLineSrc.resize(ReadLineSrc.size()-1);
-
-
-            //ReadLineSrc.removeLast();
-            if (NameToDelete == ReadLineInfo)
-            {
-
-                qDebug()<<"Удаляем строчку"<<ReadLineInfo<<"  "<<ReadLineSrc<<Qt::endl;
-                ReadLineInfo.resize(ReadLineInfo.size());
-                ReadAllInfo.remove(ReadLineInfo);
-
-                ReadLineSrc.resize(ReadLineSrc.size());
-                ReadAllSrc.remove(ReadLineSrc);
-
-            }
-            else
-            {
-                qDebug()<<"Другая строчка"<<Qt::endl;
-                streamBufferInfo<<ReadLineInfo<<Qt::endl;
-                streamBufferSrc<<ReadLineSrc<<Qt::endl;
-            }
-
-        }
-        infoNameGames.seek(0);
-        infoNameGames.write(ReadAllInfo.toUtf8());
-        srcNameGames.seek(0);
-        srcNameGames.write(ReadAllSrc.toUtf8());
-
-        //Удаляем элемент item из QListWidget'ов
         delete item;
         delete itemSrcGames;
+        db.close();
+
     }
-    else
-    {
-        qDebug()<<"При открытии файлов произошла ошибка"<<Qt::endl;
-        return;
-    }
-
-
-    //Очищаем файл
-
-    infoNameGames.close();
-    srcNameGames.close();
-    bufferInfoGames.close();
-    bufferSrcGames.close();
-    //infoNameGames.resize(0); srcNameGames.resize(0);infoNameGames.seek(0);srcNameGames.seek(0);bufferInfoGames.seek(0);bufferSrcGames.seek(0);
-
-    if(infoNameGames.open(QIODevice::WriteOnly|QIODevice::Truncate)&&srcNameGames.open(QIODevice::WriteOnly|QIODevice::Truncate))
-    {
-        infoNameGames.close();
-        srcNameGames.close();
-    }
-
-    if(infoNameGames.open(QIODevice::Append|QIODevice::Text)&&srcNameGames.open(QIODevice::Append)|QIODevice::Text
-            && bufferInfoGames.open(QIODevice::ReadWrite|QIODevice::Text)&&bufferSrcGames.open(QIODevice::ReadWrite|QIODevice::Text))
-    {
-
-        qDebug()<<"Файл с буффером успешно открыт"<<Qt::endl;
-        QTextStream outInfoNameGames(&infoNameGames);
-        QTextStream outSrcGames(&srcNameGames);
-
-        while(!(bufferInfoGames.atEnd()&&bufferSrcGames.atEnd()))
-        {
-            QString lineInfoGames = bufferInfoGames.readLine();
-            lineInfoGames.resize(lineInfoGames.size()-1);
-            outInfoNameGames<<lineInfoGames<<Qt::endl;
-
-
-
-            QString lineSrcGames = bufferSrcGames.readLine();
-            lineSrcGames.resize(lineSrcGames.size()-1);
-            outSrcGames<<lineSrcGames<<Qt::endl;
-        }
-    }
-    infoNameGames.close();
-    srcNameGames.close();
-    bufferInfoGames.close();
-    bufferSrcGames.close();
-
-    if(bufferInfoGames.open(QIODevice::WriteOnly|QIODevice::Truncate)&&bufferSrcGames.open(QIODevice::WriteOnly|QIODevice::Truncate))
-        qDebug()<<"Файлы буфера очищены"<<Qt::endl;
-    bufferInfoGames.close();
-    bufferSrcGames.close();
+    else qDebug()<<"Data base isn't open: "<<db.lastError();
 }
 
 void Launcher::loadFromFile()
 {
-    QFile infoNameGames("C:\\Users\\dark_\\Desktop\\QT Projects\\infoNameGames.txt");
-    QFile srcNameGames("C:\\Users\\dark_\\Desktop\\QT Projects\\srcNameGames.txt");
 
-    if (infoNameGames.open(QIODevice::ReadOnly | QIODevice::Text) &&
-            srcNameGames.open(QIODevice::ReadOnly | QIODevice::Text)){
-        qDebug()<<"Запись из файла началась\n";
-
-        QTextStream streamFromFileInfoGames(&infoNameGames);
-        QTextStream streamFromFileSrcGames(&srcNameGames);
-        while(!(infoNameGames.atEnd() && srcNameGames.atEnd() ))
+    db = QSqlDatabase::addDatabase("QODBC");
+    db.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};FIL={MS Access};DBQ=C:/Users/dark_/Desktop/QT Projects/Launcher/SQL Tables/InfoGamesDB.accdb");
+    if (db.open())
+    {
+        qDebug()<<"Data for load is open"<<Qt::endl;
+        QSqlQuery query;
+        query.exec("SELECT InfoGame, SrcGame FROM InfoGames");
+        if (query.isActive())
         {
-            QString readLineNameGames = infoNameGames.readLine();
-            readLineNameGames.resize(readLineNameGames.size()-1);
-
-            QString readLineSrcGames = srcNameGames.readLine();
-            readLineSrcGames.resize(readLineSrcGames.size()-1);
-
-            QListWidgetItem* readListWidgetItem = new QListWidgetItem;
-            QFileIconProvider readProvider;
-            QIcon readIcon;
-
-            readIcon = readProvider.icon(QFileInfo(readLineSrcGames));
-            readListWidgetItem->setIcon(readIcon);
-            readListWidgetItem->setText(readLineNameGames);
+            qDebug()<<"query for load is active"<<Qt::endl;
 
 
-            listWidget->addItem(readListWidgetItem);
-            HideListWidget->addItem(readLineSrcGames);
-        }
-    }else qDebug()<<"При записи из файла произошла ошибка\n";
+            while(query.next())
+            {
+                QString readLineNameGames = query.value(0).toString();
 
-    infoNameGames.close();
-    srcNameGames.close();
+                QString readLineSrcGames = query.value(1).toString();
+
+                QListWidgetItem* readListWidgetItem = new QListWidgetItem;
+                QFileIconProvider readProvider;
+                QIcon readIcon;
+
+                readIcon = readProvider.icon(QFileInfo(readLineSrcGames));
+                readListWidgetItem->setIcon(readIcon);
+                readListWidgetItem->setText(readLineNameGames);
+
+                listWidget->addItem(readListWidgetItem);
+                HideListWidget->addItem(readLineSrcGames);
+            }
+
+        }else qDebug()<<"error: "<<query.lastError();
+        db.close();
+    }
+    else qDebug()<<"Data base isn't open: "<<db.lastError();
 }

@@ -4,6 +4,11 @@
 #include <QMainWindow>
 #include <QListWidget>
 #include <QVBoxLayout>
+
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
+
 #include <QListWidgetItem>
 #include <QPushButton>
 #include <QFileDialog>
@@ -42,8 +47,6 @@ private slots:
     void loadFromFile();
     void bAnimation(QPushButton& Button);
 private:
-
-
     Ui::Launcher *ui;
 
     QVBoxLayout* vLayout;
@@ -54,11 +57,12 @@ private:
     QListWidget* HideListWidget;
     QListWidgetItem* itemListWidget;
 
-
     QVBoxLayout* layout;
     QPushButton* bDeleteGame;
     QPushButton* addApp;
     QPushButton* bStartGame;
+
+    QSqlDatabase db;
 
     //QFileIconProvider* provider;
     //QIcon* icon;
