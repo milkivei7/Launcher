@@ -11,10 +11,14 @@
 
 #include <QListWidgetItem>
 #include <QPushButton>
+
 #include <QFileDialog>
 #include <QFile>
-#include <QTextStream>
 #include <QProcess>
+#include <QSystemTrayIcon>
+
+#include <QTextStream>
+
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QStackedLayout>

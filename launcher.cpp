@@ -52,7 +52,8 @@ void Launcher::addGame()
     // Открываем диалог выбора файла
     QString fileName = QFileDialog::getOpenFileName(this, "Выберите приложение",
                                                    QString(), "Исполняемые файлы (*.exe)");
-    QString NameFile = QFileInfo(fileName).fileName();
+
+    QString NameFile = QFileInfo(fileName).baseName();
 
 
 
@@ -68,6 +69,7 @@ void Launcher::addGame()
     icon = provider.icon(QFileInfo(fileName));
     itemListWidget->setIcon(icon);
 
+    //qDebug()<<icon.name()<<Qt::endl;
     //itemListWidget->setText(fileName.right(fileName.size()-fileName.lastIndexOf("/")-1));
     itemListWidget->setText(NameFile);
     listWidget->addItem(itemListWidget);
@@ -88,25 +90,13 @@ void Launcher::addGame()
         query.prepare("INSERT INTO InfoGames (InfoGame, SrcGame) "
                            "VALUES (:InfoGame, :SrcGame)");
         query.bindValue(":InfoGame", fileName.right(fileName.size()-fileName.lastIndexOf("/")-1));
+
+        //C:/Program Files (x86)/Steam/steamapps/common/Euro Truck Simulator 2/bin/win_x64/eurotrucks2.exe
         query.bindValue(":SrcGame", fileName);
         query.exec();
         db.close();
     }
     else qDebug()<<"Data base isn't open: "<<db.lastError();
-
-    if (infoNameGames.open(QIODevice::Append | QIODevice::Text) && srcNameGames.open(QIODevice::Append | QIODevice::Text)){
-        qDebug()<<"Запись в файл началась\n";
-
-        QTextStream writeInFileInfoGames(&infoNameGames);
-        QTextStream writeInFileSrcGames(&srcNameGames);
-
-        writeInFileInfoGames<<fileName.right(fileName.size()-fileName.lastIndexOf("/")-1)<<Qt::endl;
-        writeInFileSrcGames<<fileName<<Qt::endl;
-    }else qDebug()<<"При записи в файл произошла ошибка\n";
-
-    infoNameGames.close();
-    srcNameGames.close();
-
 
 }
 void Launcher::launchGame()
