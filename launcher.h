@@ -19,6 +19,10 @@
 
 #include <QTextStream>
 
+
+//timer
+#include<QTimer>
+
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QStackedLayout>
@@ -46,7 +50,10 @@ private slots:
     void addGame();
     void deleteGame();
     void launchGame();
+    bool isStart();
 
+    //timer
+    void TimerSlot();
 
     void loadFromFile();
     void bAnimation(QPushButton& Button);
@@ -65,6 +72,13 @@ private:
     QPushButton* bDeleteGame;
     QPushButton* addApp;
     QPushButton* bStartGame;
+
+    //process
+    QProcess* startProcess;
+
+    //timer
+    QTimer* timer;
+    int time;
 
     QSqlDatabase db;
 

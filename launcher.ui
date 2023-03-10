@@ -33,10 +33,10 @@ background:white;</string>
    <widget class="QListWidget" name="hideWidget">
     <property name="geometry">
      <rect>
-      <x>352</x>
-      <y>6</y>
-      <width>242</width>
-      <height>369</height>
+      <x>280</x>
+      <y>10</y>
+      <width>31</width>
+      <height>31</height>
      </rect>
     </property>
    </widget>
@@ -187,6 +187,35 @@ background:white;</string>
         </widget>
        </item>
       </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>140</y>
+      <width>65</width>
+      <height>14</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="styleSheet">
+        <string notr="true">color: black;</string>
+       </property>
+       <property name="text">
+        <string>Time:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="timeLabel">
+       <property name="text">
+        <string>0</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>

@@ -8,6 +8,7 @@ Launcher::Launcher(QWidget *parent)
 
     ui->setupUi(this);
 
+
     addApp = ui->pushButton;
     addApp->setText("AddApp");
 
@@ -35,10 +36,14 @@ Launcher::Launcher(QWidget *parent)
     vAllLayout->addLayout(vLayout);
     vAllLayout->addLayout(hLayout);
 
+    //timer
+    time = 0;
+    timer= new QTimer(this);
+
     connect(addApp, SIGNAL(clicked()), this, SLOT(addGame()));
     connect(bStartGame, SIGNAL(clicked()), this, SLOT(launchGame()));
     connect(bDeleteGame, SIGNAL(clicked()), this, SLOT(deleteGame()));
-
+    connect(timer, SIGNAL(timeout()),this,SLOT(TimerSlot()));
     loadFromFile();
 }
 
@@ -89,7 +94,7 @@ void Launcher::addGame()
         QSqlQuery query;
         query.prepare("INSERT INTO InfoGames (InfoGame, SrcGame) "
                            "VALUES (:InfoGame, :SrcGame)");
-        query.bindValue(":InfoGame", fileName.right(fileName.size()-fileName.lastIndexOf("/")-1));
+        query.bindValue(":InfoGame", NameFile);
 
         //C:/Program Files (x86)/Steam/steamapps/common/Euro Truck Simulator 2/bin/win_x64/eurotrucks2.exe
         query.bindValue(":SrcGame", fileName);
@@ -101,12 +106,21 @@ void Launcher::addGame()
 }
 void Launcher::launchGame()
 {
+    startProcess = new QProcess(this);
     int index = listWidget->currentRow();
     if (index == -1) return;
+    //QString PathFile = listWidget->item(index)->text();
     QString PathFile = HideListWidget->item(index)->text();
     if (PathFile.isEmpty()) return;
 
-    QProcess::startDetached(PathFile);
+    startProcess->start(PathFile);
+    timer->start(1);
+    qDebug()<<startProcess->state()<<Qt::endl;
+    if (startProcess->waitForFinished())
+    {
+        qDebug()<<"Программа завершилась"<<Qt::endl;
+    }
+
 }
 
 
@@ -188,4 +202,18 @@ void Launcher::loadFromFile()
         db.close();
     }
     else qDebug()<<"Data base isn't open: "<<db.lastError();
+}
+
+bool Launcher::isStart()
+{
+    if(startProcess->state()!=QProcess::NotRunning)
+        return true;
+    else return false;
+}
+void Launcher::TimerSlot()
+{
+
+    time++;
+    ui->timeLabel->setText(QString::number(time));
+
 }
