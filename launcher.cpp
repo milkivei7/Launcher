@@ -39,11 +39,11 @@ Launcher::Launcher(QWidget *parent)
     //timer
     time = 0;
     timer= new QTimer(this);
-
+    connect(timer, SIGNAL(timeout()),this,SLOT(TimerSlot()));
     connect(addApp, SIGNAL(clicked()), this, SLOT(addGame()));
     connect(bStartGame, SIGNAL(clicked()), this, SLOT(launchGame()));
     connect(bDeleteGame, SIGNAL(clicked()), this, SLOT(deleteGame()));
-    connect(timer, SIGNAL(timeout()),this,SLOT(TimerSlot()));
+
     loadFromFile();
 }
 
@@ -59,32 +59,24 @@ void Launcher::addGame()
                                                    QString(), "Исполняемые файлы (*.exe)");
 
     QString NameFile = QFileInfo(fileName).baseName();
-
-
-
     // Проверяем выбран ли файл
     if (fileName.isEmpty())
         return;
-
    // Добавляем путь к приложению в список
-    itemListWidget = new QListWidgetItem();
 
+    itemListWidget = new QListWidgetItem();
     QFileIconProvider provider;
+    //Добавляем к нему иконку приложения
     QIcon icon;
     icon = provider.icon(QFileInfo(fileName));
     itemListWidget->setIcon(icon);
 
-    //qDebug()<<icon.name()<<Qt::endl;
-    //itemListWidget->setText(fileName.right(fileName.size()-fileName.lastIndexOf("/")-1));
     itemListWidget->setText(NameFile);
     listWidget->addItem(itemListWidget);
 
     HideListWidget->addItem(fileName);
 
-    QFile infoNameGames("C:\\Users\\dark_\\Desktop\\QT Projects\\infoNameGames.txt");
-    QFile srcNameGames("C:\\Users\\dark_\\Desktop\\QT Projects\\srcNameGames.txt");
-
-
+    //Подключаем Базу данных
     db = QSqlDatabase::addDatabase("QODBC");
     db.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};FIL={MS Access};DBQ=C:/Users/dark_/Desktop/QT Projects/Launcher/SQL Tables/InfoGamesDB.accdb");
 
@@ -95,8 +87,6 @@ void Launcher::addGame()
         query.prepare("INSERT INTO InfoGames (InfoGame, SrcGame) "
                            "VALUES (:InfoGame, :SrcGame)");
         query.bindValue(":InfoGame", NameFile);
-
-        //C:/Program Files (x86)/Steam/steamapps/common/Euro Truck Simulator 2/bin/win_x64/eurotrucks2.exe
         query.bindValue(":SrcGame", fileName);
         query.exec();
         db.close();
@@ -109,18 +99,23 @@ void Launcher::launchGame()
     startProcess = new QProcess(this);
     int index = listWidget->currentRow();
     if (index == -1) return;
-    //QString PathFile = listWidget->item(index)->text();
+
+
     QString PathFile = HideListWidget->item(index)->text();
     if (PathFile.isEmpty()) return;
 
     startProcess->start(PathFile);
-    timer->start(1);
-    qDebug()<<startProcess->state()<<Qt::endl;
-    if (startProcess->waitForFinished())
-    {
-        qDebug()<<"Программа завершилась"<<Qt::endl;
-    }
+    if (startProcess->waitForStarted()){
 
+        timer->start(1000);
+        int pid = startProcess->processId();
+        qDebug()<<"Приложение запустилось!\n"<<startProcess->state()<<" Pid: "<<pid<<Qt::endl;
+
+    }
+    if (startProcess->waitForFinished()) {
+        qDebug()<<"Приложение закрылось!\n";
+        timer->stop();
+    }
 }
 
 
@@ -179,7 +174,6 @@ void Launcher::loadFromFile()
         {
             qDebug()<<"query for load is active"<<Qt::endl;
 
-
             while(query.next())
             {
                 QString readLineNameGames = query.value(0).toString();
@@ -212,7 +206,6 @@ bool Launcher::isStart()
 }
 void Launcher::TimerSlot()
 {
-
     time++;
     ui->timeLabel->setText(QString::number(time));
 
