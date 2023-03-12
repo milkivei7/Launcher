@@ -39,10 +39,16 @@ Launcher::Launcher(QWidget *parent)
     //timer
     time = 0;
     timer= new QTimer(this);
+    startProcess = new QProcess(this);
+
     connect(timer, SIGNAL(timeout()),this,SLOT(TimerSlot()));
     connect(addApp, SIGNAL(clicked()), this, SLOT(addGame()));
     connect(bStartGame, SIGNAL(clicked()), this, SLOT(launchGame()));
     connect(bDeleteGame, SIGNAL(clicked()), this, SLOT(deleteGame()));
+
+    //connect(startProcess,SIGNAL(started()),this,SLOT(isStartProcess()));
+
+    connect(startProcess,SIGNAL(finished(int,QProcess::ExitStatus)),this,SLOT(isExitProcess()));
 
     loadFromFile();
 }
@@ -96,7 +102,7 @@ void Launcher::addGame()
 }
 void Launcher::launchGame()
 {
-    startProcess = new QProcess(this);
+    //startProcess = new QProcess;
     int index = listWidget->currentRow();
     if (index == -1) return;
 
@@ -112,10 +118,7 @@ void Launcher::launchGame()
         qDebug()<<"Приложение запустилось!\n"<<startProcess->state()<<" Pid: "<<pid<<Qt::endl;
 
     }
-    if (startProcess->waitForFinished()) {
-        qDebug()<<"Приложение закрылось!\n";
-        timer->stop();
-    }
+
 }
 
 
@@ -198,11 +201,24 @@ void Launcher::loadFromFile()
     else qDebug()<<"Data base isn't open: "<<db.lastError();
 }
 
-bool Launcher::isStart()
+void Launcher::isStartProcess()
 {
-    if(startProcess->state()!=QProcess::NotRunning)
-        return true;
-    else return false;
+    qDebug()<<" Application is open "<<Qt::endl;
+
+}
+
+void Launcher::isExitProcess()
+{
+    if (startProcess->exitStatus() == QProcess::NormalExit && startProcess->exitCode() == 0)
+    {
+               qDebug("Process finished successfully");
+               timer->stop();
+    }
+           else
+               qDebug("Process finished with error");
+
+    //qDebug()<<" Application is exit "<<Qt::endl;
+
 }
 void Launcher::TimerSlot()
 {

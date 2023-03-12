@@ -50,7 +50,8 @@ private slots:
     void addGame();
     void deleteGame();
     void launchGame();
-    bool isStart();
+    void isExitProcess();
+    void isStartProcess();
 
     //timer
     void TimerSlot();
