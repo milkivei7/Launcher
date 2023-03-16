@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QListWidget>
 #include <QVBoxLayout>
+#include <QLabel>
 
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
@@ -55,9 +56,13 @@ private slots:
 
     //timer
     void TimerSlot();
+    //testText
+    void onItemClicked();
+
 
     void loadFromFile();
     void bAnimation(QPushButton& Button);
+
 private:
     Ui::Launcher *ui;
 
@@ -65,9 +70,12 @@ private:
     QVBoxLayout* vAllLayout;
     QHBoxLayout* hLayout;
 
+    QLabel* timeText;
+
     QListWidget* listWidget;
     QListWidget* HideListWidget;
-    QListWidgetItem* itemListWidget;
+    //QListWidgetItem* itemListWidget;
+    QListWidgetItem* item;
 
     QVBoxLayout* layout;
     QPushButton* bDeleteGame;

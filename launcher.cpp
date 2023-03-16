@@ -23,6 +23,7 @@ Launcher::Launcher(QWidget *parent)
     HideListWidget = ui->hideWidget;
     HideListWidget->hide();
 
+
     vAllLayout = ui->vAllLayout;
     vLayout= ui->verticalLayout;
     hLayout = ui->horizontalLayout;
@@ -43,6 +44,9 @@ Launcher::Launcher(QWidget *parent)
 
     connect(timer, SIGNAL(timeout()),this,SLOT(TimerSlot()));
     connect(addApp, SIGNAL(clicked()), this, SLOT(addGame()));
+
+    connect(listWidget,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onItemClicked()));
+
     connect(bStartGame, SIGNAL(clicked()), this, SLOT(launchGame()));
     connect(bDeleteGame, SIGNAL(clicked()), this, SLOT(deleteGame()));
 
@@ -70,15 +74,15 @@ void Launcher::addGame()
         return;
    // Добавляем путь к приложению в список
 
-    itemListWidget = new QListWidgetItem();
+    item = new QListWidgetItem();
     QFileIconProvider provider;
     //Добавляем к нему иконку приложения
     QIcon icon;
     icon = provider.icon(QFileInfo(fileName));
-    itemListWidget->setIcon(icon);
+    item->setIcon(icon);
 
-    itemListWidget->setText(NameFile);
-    listWidget->addItem(itemListWidget);
+    item->setText(NameFile);
+    listWidget->addItem(item);
 
     HideListWidget->addItem(fileName);
 
@@ -116,7 +120,6 @@ void Launcher::launchGame()
         timer->start(1000);
         int pid = startProcess->processId();
         qDebug()<<"Приложение запустилось!\n"<<startProcess->state()<<" Pid: "<<pid<<Qt::endl;
-
     }
 
 }
@@ -145,7 +148,7 @@ void Launcher::deleteGame()
         int index = listWidget->currentRow();
         qDebug()<<"number index = "<<index<<Qt::endl;
         //передаем по индексу элемент
-        QListWidgetItem* item = listWidget->item(index);
+        item = listWidget->item(index);
         QListWidgetItem* itemSrcGames = HideListWidget->item(index);
         //Название удаляемого элемента
         QString NameToDelete = item->text();
@@ -183,15 +186,15 @@ void Launcher::loadFromFile()
 
                 QString readLineSrcGames = query.value(1).toString();
 
-                QListWidgetItem* readListWidgetItem = new QListWidgetItem;
+                item = new QListWidgetItem;
                 QFileIconProvider readProvider;
                 QIcon readIcon;
 
                 readIcon = readProvider.icon(QFileInfo(readLineSrcGames));
-                readListWidgetItem->setIcon(readIcon);
-                readListWidgetItem->setText(readLineNameGames);
+                item->setIcon(readIcon);
+                item->setText(readLineNameGames);
 
-                listWidget->addItem(readListWidgetItem);
+                listWidget->addItem(item);
                 HideListWidget->addItem(readLineSrcGames);
             }
 
@@ -213,6 +216,7 @@ void Launcher::isExitProcess()
     {
                qDebug("Process finished successfully");
                timer->stop();
+
     }
            else
                qDebug("Process finished with error");
@@ -223,6 +227,16 @@ void Launcher::isExitProcess()
 void Launcher::TimerSlot()
 {
     time++;
-    ui->timeLabel->setText(QString::number(time));
+    timeText = ui->timeLabel;
+    timeText->setText(QString::number(time));
 
+
+}
+
+void Launcher::onItemClicked()
+{
+    int index = listWidget->currentRow();
+    item = listWidget->item(index);
+
+    ui->timeLabel->setText(QString::number(9999));
 }

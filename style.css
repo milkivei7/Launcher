@@ -25,3 +25,7 @@ QListWidget{
     color: #D0D0D0;
 }
 
+QLabel#timeLabel{
+    font-size: 16px;
+    color: #D0D0D0;
+}
