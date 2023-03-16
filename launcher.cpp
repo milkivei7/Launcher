@@ -98,6 +98,7 @@ void Launcher::addGame()
                            "VALUES (:InfoGame, :SrcGame)");
         query.bindValue(":InfoGame", NameFile);
         query.bindValue(":SrcGame", fileName);
+        //query.bindValue(":Time", i);
         query.exec();
         db.close();
     }
@@ -110,11 +111,14 @@ void Launcher::launchGame()
     int index = listWidget->currentRow();
     if (index == -1) return;
 
+    PathFile=new QString;
+    *PathFile = HideListWidget->item(index)->text();
 
-    QString PathFile = HideListWidget->item(index)->text();
-    if (PathFile.isEmpty()) return;
+    nameStartProcess = PathFile;
+    //qDebug()<<*nameStartProcess<<Qt::endl;
+    if (PathFile->isEmpty()) return;
 
-    startProcess->start(PathFile);
+    startProcess->start(*PathFile);
     if (startProcess->waitForStarted()){
 
         timer->start(1000);
@@ -215,11 +219,29 @@ void Launcher::isExitProcess()
     if (startProcess->exitStatus() == QProcess::NormalExit && startProcess->exitCode() == 0)
     {
                qDebug("Process finished successfully");
+               qDebug()<<"name start = "<<*PathFile<<Qt::endl;
                timer->stop();
+
+               if (db.open())
+               {
+                   qDebug()<<"Data base is open"<<Qt::endl;
+                   QSqlQuery query;
+                   //query.prepare("INSERT INTO InfoGames (Time) VALUES (:Time) WHERE SrcGame = :SrcGame");
+                   query.prepare("UPDATE InfoGames SET [Time]=:Time WHERE [SrcGame]=:SrcGame");
+
+                   query.bindValue(":Time", time);
+                   query.bindValue(":SrcGame",*PathFile);
+                   //query.bindValue(":Time", i);
+                   query.exec();
+
+               }
+                else qDebug()<<"Errrrrrrror SQL "<<db.lastError();
+               db.close();
 
     }
            else
                qDebug("Process finished with error");
+
 
     //qDebug()<<" Application is exit "<<Qt::endl;
 

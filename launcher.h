@@ -82,9 +82,10 @@ private:
     QPushButton* addApp;
     QPushButton* bStartGame;
 
+    QString* nameStartProcess;
     //process
     QProcess* startProcess;
-
+    QString* PathFile;
     //timer
     QTimer* timer;
     int time;
