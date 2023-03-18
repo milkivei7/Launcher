@@ -190,6 +190,8 @@ void Launcher::loadFromFile()
 
                 QString readLineSrcGames = query.value(1).toString();
 
+
+
                 item = new QListWidgetItem;
                 QFileIconProvider readProvider;
                 QIcon readIcon;
@@ -260,5 +262,28 @@ void Launcher::onItemClicked()
     int index = listWidget->currentRow();
     item = listWidget->item(index);
 
-    ui->timeLabel->setText(QString::number(9999));
+    db = QSqlDatabase::addDatabase("QODBC");
+    db.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};FIL={MS Access};DBQ=C:/Users/dark_/Desktop/QT Projects/Launcher/SQL Tables/InfoGamesDB.accdb");
+
+    if (db.open())
+    {
+        qDebug()<<"Data for timer is open"<<Qt::endl;
+        QSqlQuery query;
+        QString Name = item->text();
+        query.prepare("SELECT Time FROM InfoGames WHERE [InfoGame]=:InfoGame");
+        query.bindValue(":InfoGame", Name);
+        if (!query.exec())
+        {
+            qDebug() << "Error:" << query.lastError().text();
+        }
+        while (query.next())
+        {
+            time = query.value(0).toInt();
+        }
+
+        //ui->timeLabel->setText(QString::number(9999));
+    }else qDebug()<<"DB not open "<<db.lastError()<<Qt::endl;
+    db.close();
+    ui->timeLabel->setText(QString::number(time));
+
 }
