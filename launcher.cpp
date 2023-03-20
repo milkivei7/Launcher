@@ -13,10 +13,12 @@ Launcher::Launcher(QWidget *parent)
     addApp->setText("AddApp");
 
     bStartGame = ui->bLaunchGame;
-    bStartGame->setText("Launch");
+    bStartGame->setText("\u25B6");
 
     bDeleteGame = ui->deleteGame;
     bDeleteGame->setText("Delete");
+
+    ui->label->setText("Time: ");
 
     listWidget = ui->lastWidget;
 
@@ -28,7 +30,10 @@ Launcher::Launcher(QWidget *parent)
     vLayout= ui->verticalLayout;
     hLayout = ui->horizontalLayout;
 
-    hLayout->addWidget(bStartGame);
+    ui->horizontalLayout_2->addWidget(bStartGame);
+    ui->horizontalLayout_2->addWidget(ui->label);
+    ui->horizontalLayout_2->addWidget(ui->timeLabel);
+    //hLayout->addWidget(bStartGame);
     hLayout->addWidget(addApp);
     hLayout->addWidget(bDeleteGame);
 
@@ -218,7 +223,9 @@ void Launcher::isStartProcess()
 
 void Launcher::isExitProcess()
 {
-    if (startProcess->exitStatus() == QProcess::NormalExit && startProcess->exitCode() == 0)
+
+    //if (startProcess->exitStatus() == QProcess::NormalExit && startProcess->exitCode() == 0)
+    if (startProcess->atEnd())
     {
                qDebug("Process finished successfully");
                qDebug()<<"name start = "<<*PathFile<<Qt::endl;
@@ -241,9 +248,11 @@ void Launcher::isExitProcess()
                db.close();
 
     }
-           else
-               qDebug("Process finished with error");
+           else{
 
+               qDebug("Process finished with error  -  ");
+               qDebug()<<startProcess->state()<<Qt::endl;
+                }
 
     //qDebug()<<" Application is exit "<<Qt::endl;
 

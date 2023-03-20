@@ -5,27 +5,44 @@ QWidget#centralwidget{
 
 
 QPushButton {
-    border:1.6px solid #D0D0D0;
-    border-radius: 20px;
+    border:0.8px solid #D0D0D0;
+    border-radius: 10px;
     color: #D0D0D0;
     font-size: 16px;
     background-color: rgba(28,28,28,0);
 
 }
 
+QPushButton#bLaunchGame{
+    max-width: 24px;
+    font: 20px;
+
+}
+
+QPushButton#bLaunchGame:hover{
+
+    background-color: rgb(94,184,106);
+}
+
 QPushButton:hover{
 
     background: rgba(156, 69, 136, 0.56);
-    border-radius: 50px;
+    border-radius: 10px;
     color: #D0D0D0;
 }
 QListWidget{
     border:0px;
     background: rgba(127, 55, 105, 0.7);
     color: #D0D0D0;
+    font-size: 16px;
 }
 
 QLabel#timeLabel{
     font-size: 16px;
     color: #D0D0D0;
+}
+QLabel#label{
+    font-size:16px;
+    color: #D0D0D0;
+
 }
