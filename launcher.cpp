@@ -48,8 +48,13 @@ Launcher::Launcher(QWidget *parent)
     startProcess = new QProcess(this);
 
     connect(timer, SIGNAL(timeout()),this,SLOT(TimerSlot()));
-    connect(addApp, SIGNAL(clicked()), this, SLOT(addGame()));
+    //connect(addApp, SIGNAL(clicked()), this, SLOT(addGame()));
+    connect(addApp, &QPushButton::clicked, buttons, &ButtonsFucntion::addGame);
+    connect(buttons, &ButtonsFucntion::appAdded, this, &Launcher::addGame);
 
+    //connect(this, &Launcher::signalAddGame, buttons, &ButtonsFucntion::addGame );
+    //connect(otherClass, &MyOtherClass::addApp, this, &MyMainWindow::onAddApp);
+    //connect(this, &Launcher::signalAddGame, buttons, &ButtonsFucntion::addGame);
     connect(listWidget,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onItemClicked()));
 
     connect(bStartGame, SIGNAL(clicked()), this, SLOT(launchGame()));
@@ -67,26 +72,10 @@ Launcher::~Launcher()
     delete ui;
 }
 
-void Launcher::addGame()
+void Launcher::addGame(const QString& fileName, QListWidgetItem* item)
 {
     // Открываем диалог выбора файла
-    QString fileName = QFileDialog::getOpenFileName(this, "Выберите приложение",
-                                                   QString(), "Исполняемые файлы (*.exe)");
-
     QString NameFile = QFileInfo(fileName).baseName();
-    // Проверяем выбран ли файл
-    if (fileName.isEmpty())
-        return;
-   // Добавляем путь к приложению в список
-
-    item = new QListWidgetItem();
-    QFileIconProvider provider;
-    //Добавляем к нему иконку приложения
-    QIcon icon;
-    icon = provider.icon(QFileInfo(fileName));
-    item->setIcon(icon);
-
-    item->setText(NameFile);
     listWidget->addItem(item);
 
     HideListWidget->addItem(fileName);
@@ -296,3 +285,4 @@ void Launcher::onItemClicked()
     ui->timeLabel->setText(QString::number(time));
 
 }
+

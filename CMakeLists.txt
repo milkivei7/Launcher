@@ -14,10 +14,13 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(Qt6 REQUIRED COMPONENTS Core Quick Sql)
 
 
+
 set(PROJECT_SOURCES
         main.cpp
         launcher.cpp
         launcher.h
+        buttonsfucntion.cpp
+        buttonsfucntion.h
         launcher.ui
         style.css
 )

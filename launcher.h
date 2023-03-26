@@ -31,6 +31,7 @@
 #include <QCoreApplication>
 #include <QFileIconProvider>
 
+#include "buttonsfucntion.h"
 
 
 
@@ -47,8 +48,10 @@ public:
     Launcher(QWidget *parent = nullptr);
     ~Launcher();
 
+signals:
+    void signalAddGame(QString fileName, QListWidgetItem *item);
 private slots:
-    void addGame();
+    void addGame(const QString& fileName, QListWidgetItem* item);
     void deleteGame();
     void launchGame();
     void isExitProcess();
@@ -65,6 +68,7 @@ private slots:
 
 private:
     Ui::Launcher *ui;
+    ButtonsFucntion* buttons = new ButtonsFucntion(this);
 
     QVBoxLayout* vLayout;
     QVBoxLayout* vAllLayout;
