@@ -21,6 +21,8 @@ set(PROJECT_SOURCES
         launcher.h
         buttonsfucntion.cpp
         buttonsfucntion.h
+        database.cpp
+        database.h
         launcher.ui
         style.css
 )

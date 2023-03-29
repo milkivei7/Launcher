@@ -32,6 +32,7 @@
 #include <QFileIconProvider>
 
 #include "buttonsfucntion.h"
+//#include "database.h"
 
 
 
@@ -93,10 +94,5 @@ private:
     //timer
     QTimer* timer;
     int time;
-
-    QSqlDatabase db;
-
-    //QFileIconProvider* provider;
-    //QIcon* icon;
 };
 #endif // LAUNCHER_H

@@ -33,7 +33,7 @@ Launcher::Launcher(QWidget *parent)
     ui->horizontalLayout_2->addWidget(bStartGame);
     ui->horizontalLayout_2->addWidget(ui->label);
     ui->horizontalLayout_2->addWidget(ui->timeLabel);
-    //hLayout->addWidget(bStartGame);
+
     hLayout->addWidget(addApp);
     hLayout->addWidget(bDeleteGame);
 
@@ -48,20 +48,12 @@ Launcher::Launcher(QWidget *parent)
     startProcess = new QProcess(this);
 
     connect(timer, SIGNAL(timeout()),this,SLOT(TimerSlot()));
-    //connect(addApp, SIGNAL(clicked()), this, SLOT(addGame()));
     connect(addApp, &QPushButton::clicked, buttons, &ButtonsFucntion::addGame);
     connect(buttons, &ButtonsFucntion::appAdded, this, &Launcher::addGame);
 
-    //connect(this, &Launcher::signalAddGame, buttons, &ButtonsFucntion::addGame );
-    //connect(otherClass, &MyOtherClass::addApp, this, &MyMainWindow::onAddApp);
-    //connect(this, &Launcher::signalAddGame, buttons, &ButtonsFucntion::addGame);
     connect(listWidget,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onItemClicked()));
-
     connect(bStartGame, SIGNAL(clicked()), this, SLOT(launchGame()));
     connect(bDeleteGame, SIGNAL(clicked()), this, SLOT(deleteGame()));
-
-    //connect(startProcess,SIGNAL(started()),this,SLOT(isStartProcess()));
-
     connect(startProcess,SIGNAL(finished(int,QProcess::ExitStatus)),this,SLOT(isExitProcess()));
 
     loadFromFile();
@@ -81,22 +73,14 @@ void Launcher::addGame(const QString& fileName, QListWidgetItem* item)
     HideListWidget->addItem(fileName);
 
     //Подключаем Базу данных
-    db = QSqlDatabase::addDatabase("QODBC");
-    db.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};FIL={MS Access};DBQ=C:/Users/dark_/Desktop/QT Projects/Launcher/SQL Tables/InfoGamesDB.accdb");
 
-    if (db.open())
-    {
-        qDebug()<<"Data base is open"<<Qt::endl;
-        QSqlQuery query;
-        query.prepare("INSERT INTO InfoGames (InfoGame, SrcGame) "
+    QSqlQuery query;
+    query.prepare("INSERT INTO InfoGames (InfoGame, SrcGame) "
                            "VALUES (:InfoGame, :SrcGame)");
-        query.bindValue(":InfoGame", NameFile);
-        query.bindValue(":SrcGame", fileName);
-        //query.bindValue(":Time", i);
-        query.exec();
-        db.close();
-    }
-    else qDebug()<<"Data base isn't open: "<<db.lastError();
+    query.bindValue(":InfoGame", NameFile);
+    query.bindValue(":SrcGame", fileName);
+    //query.bindValue(":Time", i);
+    query.exec();
 
 }
 void Launcher::launchGame()
@@ -136,72 +120,56 @@ void Launcher::bAnimation(QPushButton &Button)
 
 void Launcher::deleteGame()
 {
-    db = QSqlDatabase::addDatabase("QODBC");
-    db.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};FIL={MS Access};DBQ=C:/Users/dark_/Desktop/QT Projects/Launcher/SQL Tables/InfoGamesDB.accdb");
+    qDebug()<<"Data for delete is open"<<Qt::endl;
+    QSqlQuery query;
+    int index = listWidget->currentRow();
+    qDebug()<<"number index = "<<index<<Qt::endl;
+    //передаем по индексу элемент
+    item = listWidget->item(index);
+    QListWidgetItem* itemSrcGames = HideListWidget->item(index);
+    //Название удаляемого элемента
+    QString NameToDelete = item->text();
+    qDebug()<<NameToDelete<<Qt::endl;
+    query.prepare("DELETE FROM InfoGames WHERE InfoGame=:InfoGame");
+    query.bindValue(":InfoGame", NameToDelete);
+    query.exec();
 
-    if (db.open())
-    {
-        qDebug()<<"Data for delete is open"<<Qt::endl;
-        QSqlQuery query;
-        int index = listWidget->currentRow();
-        qDebug()<<"number index = "<<index<<Qt::endl;
-        //передаем по индексу элемент
-        item = listWidget->item(index);
-        QListWidgetItem* itemSrcGames = HideListWidget->item(index);
-        //Название удаляемого элемента
-        QString NameToDelete = item->text();
-        qDebug()<<NameToDelete<<Qt::endl;
+    delete item;
+    delete itemSrcGames;
 
-        query.prepare("DELETE FROM InfoGames WHERE InfoGame=:InfoGame");
-        query.bindValue(":InfoGame", NameToDelete);
-        query.exec();
 
-        delete item;
-        delete itemSrcGames;
-        db.close();
-
-    }
-    else qDebug()<<"Data base isn't open: "<<db.lastError();
 }
 
 void Launcher::loadFromFile()
 {
-
-    db = QSqlDatabase::addDatabase("QODBC");
-    db.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};FIL={MS Access};DBQ=C:/Users/dark_/Desktop/QT Projects/Launcher/SQL Tables/InfoGamesDB.accdb");
-    if (db.open())
+    QSqlQuery query;
+    query.exec("SELECT InfoGame, SrcGame FROM InfoGames");
+    if (query.isActive())
     {
-        qDebug()<<"Data for load is open"<<Qt::endl;
-        QSqlQuery query;
-        query.exec("SELECT InfoGame, SrcGame FROM InfoGames");
-        if (query.isActive())
+        qDebug()<<"query for load is active"<<Qt::endl;
+        while(query.next())
         {
-            qDebug()<<"query for load is active"<<Qt::endl;
+            QString readLineNameGames = query.value(0).toString();
 
-            while(query.next())
-            {
-                QString readLineNameGames = query.value(0).toString();
-
-                QString readLineSrcGames = query.value(1).toString();
+            QString readLineSrcGames = query.value(1).toString();
 
 
 
-                item = new QListWidgetItem;
-                QFileIconProvider readProvider;
-                QIcon readIcon;
+            item = new QListWidgetItem;
+            QFileIconProvider readProvider;
+            QIcon readIcon;
 
-                readIcon = readProvider.icon(QFileInfo(readLineSrcGames));
-                item->setIcon(readIcon);
-                item->setText(readLineNameGames);
+            readIcon = readProvider.icon(QFileInfo(readLineSrcGames));
+            item->setIcon(readIcon);
+            item->setText(readLineNameGames);
 
-                listWidget->addItem(item);
-                HideListWidget->addItem(readLineSrcGames);
-            }
+            listWidget->addItem(item);
+            HideListWidget->addItem(readLineSrcGames);
+        }
 
-        }else qDebug()<<"error: "<<query.lastError();
-        db.close();
-    }
-    else qDebug()<<"Data base isn't open: "<<db.lastError();
+    }else qDebug()<<"error: "<<query.lastError();
+
+
 }
 
 void Launcher::isStartProcess()
@@ -215,36 +183,25 @@ void Launcher::isExitProcess()
 
     //if (startProcess->exitStatus() == QProcess::NormalExit && startProcess->exitCode() == 0)
     if (startProcess->atEnd())
-    {
-               qDebug("Process finished successfully");
-               qDebug()<<"name start = "<<*PathFile<<Qt::endl;
-               timer->stop();
+    {               
+        qDebug("Process finished successfully");
+        qDebug()<<"name start = "<<*PathFile<<Qt::endl;
+        timer->stop();
+        QSqlQuery query;
+        //query.prepare("INSERT INTO InfoGames (Time) VALUES (:Time) WHERE SrcGame = :SrcGame");
 
-               if (db.open())
-               {
-                   qDebug()<<"Data base is open"<<Qt::endl;
-                   QSqlQuery query;
-                   //query.prepare("INSERT INTO InfoGames (Time) VALUES (:Time) WHERE SrcGame = :SrcGame");
-                   query.prepare("UPDATE InfoGames SET [Time]=:Time WHERE [SrcGame]=:SrcGame");
+        query.prepare("UPDATE InfoGames SET [Time]=:Time WHERE [SrcGame]=:SrcGame");
+        query.bindValue(":Time", time);
+        query.bindValue(":SrcGame",*PathFile);
 
-                   query.bindValue(":Time", time);
-                   query.bindValue(":SrcGame",*PathFile);
-                   //query.bindValue(":Time", i);
-                   query.exec();
-
-               }
-                else qDebug()<<"Errrrrrrror SQL "<<db.lastError();
-               db.close();
-
+        //query.bindValue(":Time", i);
+        query.exec();
     }
-           else{
 
-               qDebug("Process finished with error  -  ");
-               qDebug()<<startProcess->state()<<Qt::endl;
-                }
-
-    //qDebug()<<" Application is exit "<<Qt::endl;
-
+    else{
+        qDebug("Process finished with error  -  ");
+        qDebug()<<startProcess->state()<<Qt::endl;
+    }
 }
 void Launcher::TimerSlot()
 {
@@ -259,30 +216,21 @@ void Launcher::onItemClicked()
 {
     int index = listWidget->currentRow();
     item = listWidget->item(index);
-
-    db = QSqlDatabase::addDatabase("QODBC");
-    db.setDatabaseName("DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};FIL={MS Access};DBQ=C:/Users/dark_/Desktop/QT Projects/Launcher/SQL Tables/InfoGamesDB.accdb");
-
-    if (db.open())
+    QSqlQuery query;
+    QString Name = item->text();
+    query.prepare("SELECT Time FROM InfoGames WHERE [InfoGame]=:InfoGame");
+    query.bindValue(":InfoGame", Name);
+    if (!query.exec())
     {
-        qDebug()<<"Data for timer is open"<<Qt::endl;
-        QSqlQuery query;
-        QString Name = item->text();
-        query.prepare("SELECT Time FROM InfoGames WHERE [InfoGame]=:InfoGame");
-        query.bindValue(":InfoGame", Name);
-        if (!query.exec())
-        {
-            qDebug() << "Error:" << query.lastError().text();
-        }
-        while (query.next())
-        {
-            time = query.value(0).toInt();
-        }
+        qDebug() << "Error:" << query.lastError().text();
+    }
+    while (query.next())
+    {
+        time = query.value(0).toInt();
+    }
 
-        //ui->timeLabel->setText(QString::number(9999));
-    }else qDebug()<<"DB not open "<<db.lastError()<<Qt::endl;
-    db.close();
+    //ui->timeLabel->setText(QString::number(9999));
+
     ui->timeLabel->setText(QString::number(time));
 
 }
-

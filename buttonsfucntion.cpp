@@ -25,3 +25,4 @@ void ButtonsFucntion::addGame()
     item->setText(NameFile);
     emit appAdded(fileName, item);
 }
+
