@@ -1,10 +1,10 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-#include <QObject>
-#include <QSqlDatabase>
-#include <QDebug>
-#include <QSqlError>
+#include        <QObject>
+#include   <QSqlDatabase>
+#include         <QDebug>
+#include      <QSqlError>
 
 class dataBase : public QObject
 {

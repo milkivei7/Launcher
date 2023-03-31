@@ -1,40 +1,35 @@
 #ifndef LAUNCHER_H
 #define LAUNCHER_H
 
-#include <QMainWindow>
-#include <QListWidget>
-#include <QVBoxLayout>
-#include <QLabel>
+#include         <QMainWindow>
+#include         <QListWidget>
+#include         <QVBoxLayout>
+#include              <QLabel>
 
-#include <QtSql/QSqlDatabase>
-#include <QtSql/QSqlQuery>
-#include <QtSql/QSqlError>
+#include  <QtSql/QSqlDatabase>
+#include     <QtSql/QSqlQuery>
+#include     <QtSql/QSqlError>
 
-#include <QListWidgetItem>
-#include <QPushButton>
+#include     <QListWidgetItem>
+#include         <QPushButton>
 
-#include <QFileDialog>
-#include <QFile>
-#include <QProcess>
-#include <QSystemTrayIcon>
+#include         <QFileDialog>
+#include               <QFile>
+#include            <QProcess>
+#include     <QSystemTrayIcon>
 
-#include <QTextStream>
-
-
+#include         <QTextStream>
 //timer
-#include<QTimer>
+#include              <QTimer>
 
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QStackedLayout>
-#include <QPropertyAnimation>
-#include <QCoreApplication>
-#include <QFileIconProvider>
+#include         <QVBoxLayout>
+#include         <QHBoxLayout>
+#include      <QStackedLayout>
+#include  <QPropertyAnimation>
+#include    <QCoreApplication>
+#include   <QFileIconProvider>
 
 #include "buttonsfucntion.h"
-//#include "database.h"
-
-
 
 
 QT_BEGIN_NAMESPACE
@@ -46,53 +41,49 @@ class Launcher : public QMainWindow
     Q_OBJECT
 
 public:
-    Launcher(QWidget *parent = nullptr);
-    ~Launcher();
+    Launcher  (QWidget *parent = nullptr);
+    ~Launcher ();
 
 signals:
-    void signalAddGame(QString fileName, QListWidgetItem *item);
+    void signalAddGame   (QString fileName, QListWidgetItem *item);
 private slots:
-    void addGame(const QString& fileName, QListWidgetItem* item);
-    void deleteGame();
-    void launchGame();
-    void isExitProcess();
-    void isStartProcess();
-
+    void addGame         (const QString& fileName, QListWidgetItem* item);
+    void deleteGame      ();
+    void launchGame      ();
+    void isExitProcess   ();
+    void isStartProcess  ();
     //timer
-    void TimerSlot();
+    void TimerSlot       ();
     //testText
-    void onItemClicked();
-
-
-    void loadFromFile();
-    void bAnimation(QPushButton& Button);
+    void onItemClicked   ();
+    void loadFromFile    ();
+    void bAnimation      (QPushButton& Button);
 
 private:
-    Ui::Launcher *ui;
+    Ui::Launcher*    ui;
     ButtonsFucntion* buttons = new ButtonsFucntion(this);
 
-    QVBoxLayout* vLayout;
-    QVBoxLayout* vAllLayout;
-    QHBoxLayout* hLayout;
+    QVBoxLayout*     vLayout;
+    QVBoxLayout*     vAllLayout;
+    QHBoxLayout*     hLayout;
+    QLabel*          timeText;
 
-    QLabel* timeText;
+    QListWidget*     listWidget;
+    QListWidget*     HideListWidget;
 
-    QListWidget* listWidget;
-    QListWidget* HideListWidget;
-    //QListWidgetItem* itemListWidget;
     QListWidgetItem* item;
 
-    QVBoxLayout* layout;
-    QPushButton* bDeleteGame;
-    QPushButton* addApp;
-    QPushButton* bStartGame;
+    QVBoxLayout*     layout;
+    QPushButton*     bDeleteGame;
+    QPushButton*     addApp;
+    QPushButton*     bStartGame;
 
-    QString* nameStartProcess;
+    QString*         nameStartProcess;
     //process
-    QProcess* startProcess;
-    QString* PathFile;
+    QProcess*        startProcess;
+    QString*         PathFile;
     //timer
-    QTimer* timer;
-    int time;
+    QTimer*          timer;
+    int              time;
 };
 #endif // LAUNCHER_H
